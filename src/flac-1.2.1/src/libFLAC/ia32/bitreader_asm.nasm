@@ -272,11 +272,10 @@ cident FLAC__bitreader_read_rice_signed_block_asm_ia32_bswap
 	;; edi		uval
 	;; ebp		br
 	mov	edx, [ebp + 12]		;     edx <- br->bytes
-	shl	edx, 3			;     edx <- br->bytes*8
-	cmp	edx, ecx
-	jbe	.read1			;     if(br->bytes*8 > cbits) {  [NOTE: this case is rare so it doesn't have to be all that fast ]
+	test	edx, edx
+	jz	.read1			;     if(br->bytes) {  [NOTE: this case is rare so it doesn't have to be all that fast ]
 	mov	ebx, [ebp]
-					;       edx <- const unsigned end = br->bytes * 8;
+	shl	edx, 3			;       edx <- const unsigned end = br->bytes * 8;
 	mov	eax, [ebx + 4*esi]	;       b = br->buffer[cwords]
 	xchg	edx, ecx		;       [edx <- cbits , ecx <- end]
 	mov	ebx, 0xffffffff		;       ebx <- FLAC__WORD_ALL_ONES
@@ -297,7 +296,7 @@ cident FLAC__bitreader_read_rice_signed_block_asm_ia32_bswap
 .c1_next3:				;       } else {
 	sub	edi, ecx
 	add	edi, edx		;         uval += end - cbits;
-	mov	ecx, edx		;         cbits = end
+	add	ecx, edx		;         cbits += end
 					;         /* didn't find stop bit yet, have to keep going... */
 					;       }
 					;     }

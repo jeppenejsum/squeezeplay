@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "FLAC++/metadata.h"
 #include "FLAC++/encoder.h"
 
